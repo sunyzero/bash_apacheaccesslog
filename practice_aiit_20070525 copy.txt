@@ -1,0 +1,70 @@
+2007-05-25 (기간 2007-06-04까지)
+------------------------------------
+- 주관식 문제는 b 혹은 c 중에 택 1 -
+------------------------------------
+
+b) apache 로그파일을 분석하는 쉘 스크립트를 작성한다.
+
+apache access 로그중에 디렉토리, php, html, htm, wm*, txt 를 접근한 경우만
+뽑아내어서 어떤 페이지가 가장 많이 읽혔는지 랭킹 작업을 만든다.
+단, cgi 형식의 form 페이지는 제외한다. (e.g. ...test.php?id=guest&num=51 )
+
+e.g.) 아래는 각 페이지별로 히트수와 %를 보여준다. (%는 소수점 2자리까지 유효)
+
+<예시:앞부분 5개의 결과는 실제 결과 수치와 동일하다.>
+
+$ ./extract_access_log.sh apache_accesslog.log
+Total List : 97, Total Hits : 384
+Hits ,     %  : URI
+ 65, 16.92 %  : /zboard/zboard.php
+ 59, 15.36 %  : /zboard/view.php
+ 42, 10.93 %  : /robots.txt
+ 24,  6.25 %  : /diary/search3.php
+ 17,  4.42 %  : /diary/view.php
+
+...생략...
+
+<작업 조건>
+0) 쉘 스크립트는 bash 문법을 따른다.
+1) 쉘 스크립트 파일명은 extract_access_log.sh 로 한다.
+2) 로그파일은 별도로 첨부한 파일을 사용한다.
+3) hit 수가 높은 페이지순으로 정렬한다.
+4) sed, awk 등의 사용을 허한다. perl의 사용은 금한다.
+
+ 
+
+c) 아래와 같은 설정 파일(stats_filelists.conf)이 있다.
+------------ 아래 -------------
+20070526 20070528 /home/linuxer/download *.jpg *.gif *.png
+20070524 20070526 /home/linuxer/project *.txt *.c *.h README
+-------------------------------
+위의 설정 파일은 총 4개의 섹션별로 되어있다. 
+1번째 필드는 시작일, 2번째는 끝나는 날짜이며, 3번은 검색을 시작할 위치이다.
+그리고 4번~이상은 검색할 파일명이다.
+
+즉 "20070526 20070528 *.jpg *.gif *.png" 행은 파일수정시간(mtime)이 2007년 5월 26일부터 
+2007년 5월 28일까지인 파일중에 파일명이 *.jpg *.gif *.png 인 경우를 
+/home/linuxer/download 디렉토리로부터 찾는 것을 의미한다.
+그리고 검색된 파일리스트와 그 총용량은 result_YYYYMMDD##.txt 의 파일명으로 저장해야 한다.
+(## 에는 순서대로 숫자를 01, 02 식으로 붙인다)
+
+따라서 위 예제 설정대로 검색된다면, 현재날짜가 20070524일때, result_2007052401.txt 와 
+result_2007052402.txt 의 2개의 파일에 결과가 저장되어야 할것이다.
+
+<예시>
+
+$ ./stats_filelists.sh stats_filelists.conf
+...실행중...
+$ cat result_2007052402.txt
+condition                   : 20070524 20070526 *.txt *.c *.h README
+processing time (sec) : 217
+total size (byte)          : 2748056
+/home/linuxer/project/README    3721
+/home/linuxer/project/history.txt  12730
+...생략...
+
+<작업 조건>
+0) 쉘 스크립트는 bash 문법을 따른다.
+1) 쉘 스크립트 파일명은 stats_filelists.sh 로 한다.
+2) find 나 ls, stat 등의 명령어를 참조하라.(꼭 사용하라는 것을 강제하는 것이 아니다!)
+
